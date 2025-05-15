@@ -1,0 +1,11 @@
+services:
+  - type: web
+    name: twilio-flask-app
+    runtime: python
+    buildCommand: ""
+    startCommand: python app.py
+    plan: free
+    autoDeploy: true
+    envVars:
+      - key: FLASK_ENV
+        value: production

@@ -1,0 +1,182 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Twilio Mass Caller</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 0; padding: 20px; }
+        .container { max-width: 800px; margin: 0 auto; }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; }
+        input, select { width: 100%; padding: 8px; box-sizing: border-box; }
+        button { padding: 10px 15px; background-color: #4CAF50; color: white; border: none; cursor: pointer; }
+        button:disabled { background-color: #999; cursor: not-allowed; }
+        .results { margin-top: 20px; }
+        table { border-collapse: collapse; width: 100%; margin-top: 10px; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+        th { background-color: #f2f2f2; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Twilio Mass Caller</h1>
+        
+        <form id="callForm">
+            <div class="form-group">
+                <label for="dataSource">Data Source:</label>
+                <select id="dataSource" name="data_source">
+                    <option value="csv">CSV File</option>
+                    <option value="google_sheet">Google Sheet</option>
+                </select>
+            </div>
+            
+            <div id="csvSection" class="form-group">
+                <label for="csvFile">CSV File:</label>
+                <input type="file" id="csvFile" name="file">
+                <small>CSV should have at least a 'phone_number' column</small>
+            </div>
+            
+            <div id="googleSheetSection" class="form-group" style="display: none;">
+                <div class="form-group">
+                    <label for="sheetId">Google Sheet ID:</label>
+                    <input type="text" id="sheetId" name="sheet_id">
+                </div>
+                <div class="form-group">
+                                    <label for="worksheetName">Worksheet Name:</label>
+                <input type="text" id="worksheetName" name="worksheet_name" value="Sheet1">
+            </div>
+        </div>
+        
+        <div class="form-group">
+            <label for="batchSize">Batch Size:</label>
+            <input type="number" id="batchSize" name="batch_size" value="100" min="1" max="500">
+            <small>Number of calls to process in each batch</small>
+        </div>
+        
+        <button type="submit">Start Calling</button>
+    </form>
+    
+    <div class="results" id="callResults"></div>
+    
+    <button id="exportBtn" style="margin-top: 20px;">Export Results as CSV</button>
+</div>
+
+<script>
+    const dataSourceSelect = document.getElementById('dataSource');
+    const csvSection = document.getElementById('csvSection');
+    const googleSheetSection = document.getElementById('googleSheetSection');
+    const callForm = document.getElementById('callForm');
+    const callResultsDiv = document.getElementById('callResults');
+    const exportBtn = document.getElementById('exportBtn');
+    
+    dataSourceSelect.addEventListener('change', () => {
+        if (dataSourceSelect.value === 'csv') {
+            csvSection.style.display = 'block';
+            googleSheetSection.style.display = 'none';
+        } else {
+            csvSection.style.display = 'none';
+            googleSheetSection.style.display = 'block';
+        }
+    });
+    
+    callForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        startCalling();
+    });
+    
+    function getStatusLabel(status) {
+        const statusMap = {
+            queued: { label: "Queued", color: "gray" },
+            ringing: { label: "Ringing", color: "blue" },
+            "in-progress": { label: "In Progress", color: "orange" },
+            completed: { label: "Completed", color: "green" },
+            busy: { label: "Busy", color: "red" },
+            failed: { label: "Failed", color: "red" },
+            "no-answer": { label: "No Answer", color: "red" },
+            canceled: { label: "Canceled", color: "red" }
+        };
+        return statusMap[status] || { label: status, color: "black" };
+    }
+    
+    function refreshCallStatus() {
+        fetch('/calls-status')
+        .then(response => response.json())
+        .then(data => {
+            if (Object.keys(data).length === 0) {
+                // No calls yet, clear table
+                callResultsDiv.innerHTML = '';
+                return;
+            }
+
+            let html = '<table><tr><th>Call SID</th><th>Phone Number</th><th>Name</th><th>Status</th><th>Recording</th><th>Transcript</th></tr>';
+            
+            for (const [callSid, callData] of Object.entries(data)) {
+                const statusInfo = getStatusLabel(callData.status);
+                html += `<tr>
+                    <td>${callSid}</td>
+                    <td>${callData.phone_number}</td>
+                    <td>${callData.name || '-'}</td>
+                    <td style="color: ${statusInfo.color}; font-weight: bold;">${statusInfo.label}</td>
+                    <td>${callData.recording_url ? '<a href="' + callData.recording_url + '" target="_blank">Listen</a>' : '-'}</td>
+                    <td>${callData.transcript || '-'}</td>
+                </tr>`;
+            }
+            
+            html += '</table>';
+            callResultsDiv.innerHTML = html;
+        });
+    }
+    
+    function startCalling() {
+        const formData = new FormData(callForm);
+        
+        // Basic validation
+        if (formData.get('data_source') === 'csv') {
+            if (!formData.get('file').name) {
+                alert('Please select a CSV file.');
+                return;
+            }
+        } else {
+            if (!formData.get('sheet_id')) {
+                alert('Please enter a Google Sheet ID.');
+                return;
+            }
+        }
+        
+        // Disable form during call initiation
+        callForm.querySelector('button[type="submit"]').disabled = true;
+        callResultsDiv.innerHTML = 'Starting calls...';
+        
+        fetch('/make-calls', {
+            method: 'POST',
+            body: formData
+        })
+        .then(res => res.json())
+        .then(response => {
+            if (response.error) {
+                callResultsDiv.innerHTML = `<p style="color:red;">Error: ${response.error}</p>`;
+            } else {
+                callResultsDiv.innerHTML = `<p>${response.message}</p>`;
+                refreshCallStatus();
+            }
+        })
+        .catch(err => {
+            callResultsDiv.innerHTML = `<p style="color:red;">Error: ${err.message}</p>`;
+        })
+        .finally(() => {
+            callForm.querySelector('button[type="submit"]').disabled = false;
+        });
+    }
+    
+    exportBtn.addEventListener('click', () => {
+        window.location.href = '/export-results?format=csv';
+    });
+    
+    // Auto-refresh call statuses every 10 seconds
+    setInterval(refreshCallStatus, 10000);
+    
+    // Initial load of call statuses
+    refreshCallStatus();
+</script>
+</body>
+</html>
