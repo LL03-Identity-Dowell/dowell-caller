@@ -823,6 +823,7 @@ if __name__ == '__main__':
         // State variables
         let callsInProgress = false;
         let callSids = [];
+        let refreshInterval = null;
         
         // Toggle data source sections when the selection changes
         dataSourceSelect.addEventListener('change', () => {
@@ -925,6 +926,11 @@ if __name__ == '__main__':
                 callsInProgress = completedCount < totalCount;
                 updateUIState();
                 
+                // If all calls are completed, stop the refresh interval
+                if (!callsInProgress && refreshInterval) {
+                    stopStatusRefresh();
+                }
+                
                 // Generate table HTML
                 let html = `
                     <table>
@@ -973,6 +979,9 @@ if __name__ == '__main__':
                         'success',
                         '<button class="btn btn-secondary" onclick="resetApplication()"><i class="fas fa-redo"></i> Start New Batch</button>'
                     );
+                    
+                    // Stop the refresh interval since all calls are done
+                    stopStatusRefresh();
                 }
             })
             .catch(err => {
@@ -1016,6 +1025,11 @@ if __name__ == '__main__':
                 } else {
                     callSids = response.call_sids || [];
                     showStatusMessage(`${response.message}. Calls in progress...`, 'loading');
+                    
+                    // Start the status refresh interval only after calls have been initiated
+                    startStatusRefresh();
+                    
+                    // Initial call status refresh
                     refreshCallStatus();
                 }
             })
@@ -1043,6 +1057,13 @@ if __name__ == '__main__':
                 callsInProgress = false;
                 updateUIState();
                 refreshCallStatus();
+                
+                // Check again after a short delay to see if all calls are done
+                setTimeout(() => {
+                    if (!callsInProgress) {
+                        stopStatusRefresh();
+                    }
+                }, 5000);
             }, 1000);
             
             // Actual implementation would look something like this:
@@ -1080,6 +1101,9 @@ if __name__ == '__main__':
             callsInProgress = false;
             callSids = [];
             updateUIState();
+            
+            // Stop status refresh
+            stopStatusRefresh();
             
             // Hide status message
             statusMessage.classList.add('hidden');
@@ -1124,16 +1148,35 @@ if __name__ == '__main__':
             }
         }
         
-        // Auto-refresh call statuses every 5 seconds
-        const refreshInterval = setInterval(refreshCallStatus, 5000);
+        // Start the status refresh interval
+        function startStatusRefresh() {
+            // Clear any existing interval first
+            stopStatusRefresh();
+            
+            // Set up a new interval
+            refreshInterval = setInterval(refreshCallStatus, 5000);
+        }
         
-        // Initial load of call statuses
-        refreshCallStatus();
+        // Stop the status refresh interval
+        function stopStatusRefresh() {
+            if (refreshInterval) {
+                clearInterval(refreshInterval);
+                refreshInterval = null;
+            }
+        }
         
         // Handle page refresh/reload
         window.addEventListener('beforeunload', () => {
-            clearInterval(refreshInterval);
+            stopStatusRefresh();
         });
+        
+        // Initial page load - just show empty state, don't start polling
+        callResultsDiv.innerHTML = `
+            <div class="empty-state">
+                <i class="fas fa-phone-slash"></i>
+                <p>No calls have been made yet</p>
+            </div>
+        `;
     </script>
 </body>
 </html>''')
