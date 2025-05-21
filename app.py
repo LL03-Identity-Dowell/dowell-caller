@@ -745,7 +745,7 @@ if __name__ == '__main__':
                 <div id="csvSection" class="form-group">
                     <label for="csvFile">CSV File:</label>
                     <input type="file" id="csvFile" name="file">
-                    <small>CSV should have at least a 'phone_number' column</small>
+                    <small>CSV should have phone numbers in the first column</small>
                 </div>
                 
                 <div id="googleSheetSection" class="form-group hidden">
@@ -764,7 +764,7 @@ if __name__ == '__main__':
                 <div class="form-group">
                     <label for="batchSize">Batch Size:</label>
                     <input type="number" id="batchSize" name="batch_size" value="100" min="1" max="500">
-                    <small>Number of calls to process in each batch</small>
+                    <small>Number of calls to make at a time</small>
                 </div>
                 
                 <div class="btn-container">
