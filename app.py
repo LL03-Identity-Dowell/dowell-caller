@@ -21,7 +21,7 @@ TWILIO_AUTH_TOKEN = os.getenv('TWILIO_AUTH_TOKEN')
 TWILIO_PHONE_NUMBER = os.getenv('TWILIO_PHONE_NUMBER')
 
 # For local testing, use localhost; in production, use domain
-BASE_URL = os.getenv('BASE_URL', 'http://localhost:5000')
+BASE_URL = os.getenv('BASE_URL', 'https://dowell-caller.onrender.com/')
 
 
 # Google Sheets configuration
@@ -37,24 +37,43 @@ client = Client(TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN)
 calls_data = {}
 
 
+# def load_numbers_from_csv(file_path):
+#     numbers = []
+#     required_field = 'phone_number'
+
+#     try:
+#         with open(file_path, 'r') as file:
+#             reader = csv.DictReader(file)
+#             headers = reader.fieldnames
+
+#             # Check if 'phone_number' column exists
+#             if required_field not in headers:
+#                 app.logger.error(f"Missing required column: '{required_field}'")
+#                 return []
+
+#             for row in reader:
+#                 phone = row.get(required_field, '').strip()
+#                 if phone and phone.isdigit():  # Basic validation
+#                     numbers.append(row)
+#                 else:
+#                     app.logger.warning(f"Invalid or missing phone number in row: {row}")
+#     except Exception as e:
+#         app.logger.error(f"Error reading CSV: {str(e)}")
+#     return numbers
+
 def load_numbers_from_csv(file_path):
     numbers = []
-    required_field = 'phone_number'
-
     try:
         with open(file_path, 'r') as file:
-            reader = csv.DictReader(file)
-            headers = reader.fieldnames
-
-            # Check if 'phone_number' column exists
-            if required_field not in headers:
-                app.logger.error(f"Missing required column: '{required_field}'")
-                return []
+            reader = csv.reader(file)
+            next(reader, None)  # Skip header row
 
             for row in reader:
-                phone = row.get(required_field, '').strip()
-                if phone and phone.isdigit():  # Basic validation
-                    numbers.append(row)
+                if len(row) == 0:
+                    continue
+                phone = row[0].strip()
+                if phone and phone.isdigit():
+                    numbers.append({'phone_number': phone})
                 else:
                     app.logger.warning(f"Invalid or missing phone number in row: {row}")
     except Exception as e:
@@ -82,34 +101,28 @@ def load_numbers_from_google_sheet(sheet_id, worksheet_name='Sheet1'):
         app.logger.error(f"Error loading Google Sheet: {str(e)}")
         return []
 
-
 def make_call(phone_data):
     with app.app_context(): 
         try:
             phone_number = phone_data.get('phone_number')
-            print("Loaded phone data:", phone_data)
-            print("Number of entries:", len(phone_data))
             if not phone_number:
                 return None
 
-            # Additional data that might be used in the message
-            name = phone_data.get('name', '')
+            # Make 'name' optional
+            name = phone_data.get('name', '')  # will be empty string if missing
 
-            # Build URLs manually
             call_url = f"{BASE_URL}/handle-call?name={name}"
             status_cb_url = f"{BASE_URL}/call-status"
 
-            # Make the call
             call = client.calls.create(
-            to=phone_number,
-            from_=TWILIO_PHONE_NUMBER,
-            url=call_url,
-            record=True,
-            status_callback=status_cb_url,
-            status_callback_event=['completed']
+                to=phone_number,
+                from_=TWILIO_PHONE_NUMBER,
+                url=call_url,
+                record=True,
+                status_callback=status_cb_url,
+                status_callback_event=['completed']
             )
 
-            # Store call info
             calls_data[call.sid] = {
                 'phone_number': phone_number,
                 'name': name,
@@ -122,6 +135,47 @@ def make_call(phone_data):
         except Exception as e:
             app.logger.error(f"Error making call to {phone_number}: {str(e)}")
             return None
+
+
+# def make_call(phone_data):
+#     with app.app_context(): 
+#         try:
+#             phone_number = phone_data.get('phone_number')
+#             print("Loaded phone data:", phone_data)
+#             print("Number of entries:", len(phone_data))
+#             if not phone_number:
+#                 return None
+
+#             # Additional data that might be used in the message
+#             name = phone_data.get('name', '')
+
+#             # Build URLs manually
+#             call_url = f"{BASE_URL}/handle-call?name={name}"
+#             status_cb_url = f"{BASE_URL}/call-status"
+
+#             # Make the call
+#             call = client.calls.create(
+#             to=phone_number,
+#             from_=TWILIO_PHONE_NUMBER,
+#             url=call_url,
+#             record=True,
+#             status_callback=status_cb_url,
+#             status_callback_event=['completed']
+#             )
+
+#             # Store call info
+#             calls_data[call.sid] = {
+#                 'phone_number': phone_number,
+#                 'name': name,
+#                 'status': 'initiated',
+#                 'transcript': None,
+#                 'recording_url': None
+#             }
+
+#             return call.sid
+#         except Exception as e:
+#             app.logger.error(f"Error making call to {phone_number}: {str(e)}")
+#             return None
 
 
 def process_calls_in_batches(phone_data_list, batch_size=100):
