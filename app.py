@@ -43,26 +43,6 @@ client = Client(TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN)
 # Store call data
 calls_data = {}
 
-
-# def load_numbers_from_csv(file_path):
-#     numbers = []
-#     try:
-#         with open(file_path, 'r') as file:
-#             reader = csv.reader(file)
-#             next(reader, None)  # Skip header row
-
-#             for row in reader:
-#                 if len(row) == 0:
-#                     continue
-#                 phone = row[0].strip()
-#                 if phone and phone.isdigit():
-#                     numbers.append({'phone_number': phone})
-#                 else:
-#                     app.logger.warning(f"Invalid or missing phone number in row: {row}")
-#     except Exception as e:
-#         app.logger.error(f"Error reading CSV: {str(e)}")
-#     return numbers
-
 def load_numbers_from_csv(file_path):
     numbers = []
     try:
@@ -77,24 +57,6 @@ def load_numbers_from_csv(file_path):
     except Exception as e:
         app.logger.error(f"Error reading CSV: {str(e)}")
     return numbers
-
-# def load_numbers_from_google_sheet(sheet_id, worksheet_name='Sheet1'):
-#     try:
-#         # Setup the Google Sheets API
-#         credentials = ServiceAccountCredentials.from_json_keyfile_name(
-#             GOOGLE_CREDENTIALS_FILE, SCOPES)
-#         gc = gspread.authorize(credentials)
-
-#         # Open the spreadsheet and worksheet
-#         sheet = gc.open_by_key(sheet_id)
-#         worksheet = sheet.worksheet(worksheet_name)
-
-#         # Get all values and convert to list of dictionaries
-#         records = worksheet.get_all_records()
-#         return records
-#     except Exception as e:
-#         app.logger.error(f"Error loading Google Sheet: {str(e)}")
-#         return []
 
 def load_numbers_from_google_sheet(sheet_id, worksheet_name='Sheet1'):
     try:
@@ -113,41 +75,6 @@ def load_numbers_from_google_sheet(sheet_id, worksheet_name='Sheet1'):
     except Exception as e:
         app.logger.error(f"Error loading Google Sheet: {str(e)}")
         return []
-
-# def make_call(phone_data):
-#     with app.app_context(): 
-#         try:
-#             phone_number = phone_data.get('phone_number')
-#             if not phone_number:
-#                 return None
-
-#             # Make 'name' optional
-#             name = phone_data.get('name', '')  # will be empty string if missing
-
-#             call_url = f"{BASE_URL}/handle-call?name={name}"
-#             status_cb_url = f"{BASE_URL}/call-status"
-
-#             call = client.calls.create(
-#                 to=phone_number,
-#                 from_=TWILIO_PHONE_NUMBER,
-#                 url=call_url,
-#                 record=True,
-#                 status_callback=status_cb_url,
-#                 status_callback_event=['completed']
-#             )
-
-#             calls_data[call.sid] = {
-#                 'phone_number': phone_number,
-#                 'name': name,
-#                 'status': 'initiated',
-#                 'transcript': None,
-#                 'recording_url': None
-#             }
-
-#             return call.sid
-#         except Exception as e:
-#             app.logger.error(f"Error making call to {phone_number}: {str(e)}")
-#             return None
 
 def make_call(phone_data):
     with app.app_context():
@@ -169,10 +96,15 @@ def make_call(phone_data):
                 from_=TWILIO_PHONE_NUMBER,
                 url=call_url,
                 record=True,
+                recording_status_callback=f"{BASE_URL}/recording-callback",
+                recording_status_callback_method='POST',
+                transcription_enabled=True,  # ← Transcription is deprecated this way; use async transcription
+                transcription_callback=f"{BASE_URL}/transcription-callback",
                 status_callback=status_cb_url,
                 status_callback_event=['completed']
             )
             calls_data[call.sid] = {
+                'call_ssid': call.sid,
                 'phone_number': phone_number,
                 'name': name,
                 'message': message,
@@ -206,31 +138,6 @@ def process_calls_in_batches(phone_data_list, batch_size=100):
 def index():
     return render_template('index.html')
 
-# @app.route('/handle-call', methods=['POST'])
-# def handle_call():
-#     response = VoiceResponse()
-
-#     # Get the name parameter if available
-#     name = request.args.get('name', '')
-#     greeting = "Hello" if not name else f"Hello {name}"
-
-#     # Customize your message here
-#     response.say(f"{greeting}, this is an automated call from dowell. "
-#                  "This call is being recorded for quality and training purposes.",
-#                  voice='alice')
-
-#     response.pause(length=1)
-
-#     # Add your custom message content here
-#     response.say("Thank you for your time. Have a great day!", voice='alice')
-
-#     # Record the call
-#     response.record(action=url_for('recording_callback'),
-#                     transcribe=True,
-#                     transcribeCallback=url_for('transcription_callback'))
-
-#     return Response(str(response), mimetype='text/xml')
-
 @app.route('/handle-call', methods=['POST'])
 def handle_call():
     response = VoiceResponse()
@@ -238,7 +145,7 @@ def handle_call():
     message = request.args.get('message', '')
 
     greeting = "Hello" if not name else f"Hello {name}"
-    response.say(f"{greeting}, this is an automated call from Dowell.", voice='alice')
+    response.say(f"{greeting}, this is a call from Dowell Research.", voice='alice')
 
     if message:
         response.say(message, voice='alice')
@@ -249,7 +156,7 @@ def handle_call():
     response.append(gather)
 
     # If no input, say goodbye
-    response.say("We did not receive a response. Goodbye.", voice='alice')
+    response.say("We did not receive a response. Thank you for your time.", voice='alice')
     response.hangup()
 
     return Response(str(response), mimetype='text/xml')
@@ -269,9 +176,9 @@ def gather_response():
     if 'yes' in speech_result:
         response.say("Thank you for the response. We will send you an invite shortly.", voice='alice')
     elif 'no' in speech_result:
-        response.say("Thank you for the response. We appreciate you.", voice='alice')
+        response.say("Thank you for the response. We appreciate your time.", voice='alice')
     elif 'call back later' in speech_result or 'i will call back' in speech_result:
-        response.say("Thank you for the response.", voice='alice')
+        response.say("Thank you for the response. We will call you back at another time", voice='alice')
     else:
         response.say("Sorry, I did not understand your response.", voice='alice')
 
@@ -330,7 +237,7 @@ def initiate_calls():
         phone_data = load_numbers_from_csv(temp_path)
 
         if not phone_data:
-            return jsonify({'error': 'No valid phone numbers found in CSV. Please ensure it includes a "phone_number" column with numeric values.'}), 400
+            return jsonify({'Error': 'No valid phone numbers found in CSV. Please ensure your csv includes a "phone_number" column with numeric values.'}), 400
 
         # Remove the temporary file
         os.remove(temp_path)
@@ -423,12 +330,6 @@ def export_results():
         )
     else:
         return jsonify(calls_data)
-
-# if __name__ == '__main__':
-#     # Create templates directory if it doesn't exist
-#     os.makedirs('templates', exist_ok=True)
-
-# app.run(host="0.0.0.0", port=10000, debug=True)
 
 if __name__ == '__main__':
     os.makedirs('templates', exist_ok=True)
