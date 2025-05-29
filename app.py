@@ -424,9 +424,14 @@ def export_results():
     else:
         return jsonify(calls_data)
 
-if __name__ == '__main__':
-    # Create templates directory if it doesn't exist
-    os.makedirs('templates', exist_ok=True)
+# if __name__ == '__main__':
+#     # Create templates directory if it doesn't exist
+#     os.makedirs('templates', exist_ok=True)
 
-app.run(host="0.0.0.0", port=10000, debug=True)
+# app.run(host="0.0.0.0", port=10000, debug=True)
+
+if __name__ == '__main__':
+    os.makedirs('templates', exist_ok=True)
+    port = int(os.environ.get("PORT", 10000))  # fallback to 10000 for local dev
+    app.run(host="0.0.0.0", port=port, debug=True)
 
