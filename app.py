@@ -26,10 +26,10 @@ TWILIO_PHONE_NUMBER = os.getenv('TWILIO_PHONE_NUMBER')
 # For local testing, use localhost; in production, use domain
 BASE_URL = os.getenv('BASE_URL', 'https://dowell-caller.onrender.com/')
 
-google_credentials_json = os.getenv("GOOGLE_CREDENTIALS_JSON")
+google_credentials_json = os.getenv("GOOGLE_CREDENTIALS_FILE")
 
 if not google_credentials_json:
-    raise Exception("Missing GOOGLE_CREDENTIALS_JSON environment variable")
+    raise Exception("Missing GOOGLE_CREDENTIALS_FILE environment variable")
 
 # Google Sheets configuration
 GOOGLE_CREDENTIALS_FILE = os.getenv(
