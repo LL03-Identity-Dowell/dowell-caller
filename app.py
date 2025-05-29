@@ -10,6 +10,8 @@ from oauth2client.service_account import ServiceAccountCredentials
 from concurrent.futures import ThreadPoolExecutor
 from dotenv import load_dotenv
 from threading import Lock
+import json
+from io import StringIO
 
 # Load environment variables
 load_dotenv(dotenv_path='.env')
@@ -24,6 +26,10 @@ TWILIO_PHONE_NUMBER = os.getenv('TWILIO_PHONE_NUMBER')
 # For local testing, use localhost; in production, use domain
 BASE_URL = os.getenv('BASE_URL', 'https://dowell-caller.onrender.com/')
 
+google_credentials_json = os.getenv("GOOGLE_CREDENTIALS_JSON")
+
+if not google_credentials_json:
+    raise Exception("Missing GOOGLE_CREDENTIALS_JSON environment variable")
 
 # Google Sheets configuration
 GOOGLE_CREDENTIALS_FILE = os.getenv(
@@ -92,7 +98,9 @@ def load_numbers_from_csv(file_path):
 
 def load_numbers_from_google_sheet(sheet_id, worksheet_name='Sheet1'):
     try:
-        credentials = ServiceAccountCredentials.from_json_keyfile_name(GOOGLE_CREDENTIALS_FILE, SCOPES)
+        # credentials = ServiceAccountCredentials.from_json_keyfile_name(GOOGLE_CREDENTIALS_FILE, SCOPES)
+        credentials_dict = json.loads(google_credentials_json)
+        credentials = ServiceAccountCredentials.from_json_keyfile_dict(credentials_dict, SCOPES)
         gc = gspread.authorize(credentials)
         sheet = gc.open_by_key(sheet_id)
         worksheet = sheet.worksheet(worksheet_name)
