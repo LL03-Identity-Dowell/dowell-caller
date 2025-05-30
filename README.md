@@ -1,5 +1,5 @@
 
-# 📞 Twilio Voice Call Automation Platform
+# 📞 Dowell Voice Call Automation
 
 This project is a Flask-based web application that allows you to initiate automated voice calls using Twilio. It supports both CSV and Google Sheet inputs and provides real-time tracking of call status, recordings, speech input, and transcripts.
 
