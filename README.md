@@ -51,8 +51,8 @@ https://dowell-caller.onrender.com/
 ### 1. Clone the Repository
 
 ```bash
-git clone https://github.com/yourusername/twilio-caller.git
-cd twilio-caller
+https://github.com/LL03-Identity-Dowell/dowell-caller.git
+cd dowell-caller
 ```
 
 ### 2. Install Dependencies
