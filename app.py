@@ -98,8 +98,6 @@ def make_call(phone_data):
                 record=True,
                 recording_status_callback=f"{BASE_URL}/recording-callback",
                 recording_status_callback_method='POST',
-                # transcription_enabled=True,  # ← Transcription is deprecated this way; use async transcription
-                transcription_callback=f"{BASE_URL}/transcription-callback",
                 status_callback=status_cb_url,
                 status_callback_event=['completed']
             )
