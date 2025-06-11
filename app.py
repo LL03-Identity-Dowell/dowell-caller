@@ -107,7 +107,6 @@ def make_call(phone_data):
                 'name': name,
                 'message': message,
                 'status': 'initiated',
-                'transcript': None,
                 'recording_url': None,
                 'gather_response': None  # new field for speech input during call
             }
@@ -204,15 +203,15 @@ def recording_callback():
 
     return '', 204
 
-@app.route('/transcription-callback', methods=['POST'])
-def transcription_callback():
-    call_sid = request.form.get('CallSid')
-    transcription_text = request.form.get('TranscriptionText')
+# @app.route('/transcription-callback', methods=['POST'])
+# def transcription_callback():
+#     call_sid = request.form.get('CallSid')
+#     transcription_text = request.form.get('TranscriptionText')
 
-    if call_sid in calls_data:
-        calls_data[call_sid]['transcript'] = transcription_text
+#     if call_sid in calls_data:
+#         calls_data[call_sid]['transcript'] = transcription_text
 
-    return '', 204
+#     return '', 204
 
 @app.route('/make-calls', methods=['POST'])
 def initiate_calls():

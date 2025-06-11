@@ -550,7 +550,6 @@
                                 <th>Name</th>
                                 <th>Status</th>
                                 <th>Recording</th>
-                                <th>Transcript</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -566,10 +565,7 @@
                                 `<a href="${callData.recording_url}" target="_blank" class="link-button">
                                     <i class="fas fa-play-circle"></i> Listen
                                 </a>` : 
-                                '-'}</td>
-                            <td>${callData.transcript ? 
-                                `<span title="${callData.transcript}">${callData.transcript.substring(0, 50)}${callData.transcript.length > 50 ? '...' : ''}</span>` : 
-                                '-'}</td>
+                                '-'}</td>s
                         </tr>
                     `;
                 }
