@@ -142,7 +142,7 @@ def handle_call():
     message = request.args.get('message', '')
 
     greeting = "Hi" if not name else f"Hi, is this {name}?"
-    response.say(f"{greeting}, My name is Samanta from DoWell Research.", voice='alice')
+    response.say(f"{greeting}, My name is Samanta from Do Well Research.", voice='alice')
 
     if message:
         response.say(message, voice='alice')
