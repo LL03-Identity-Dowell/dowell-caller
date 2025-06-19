@@ -146,13 +146,14 @@ def handle_call():
     greeting = "Hi!" if not name else f"Hi! How are you today?"
     response.say(f"{greeting}", voice='Polly.Raveena', language='en-IN')
     response.pause(length=3)
-    response.say("Is this {name}?", voice='Polly.Raveena', language='en-IN')
+    response.say(f"Is this {name}?", voice='Polly.Raveena', language='en-IN')
     response.pause(2)
     response.say("My name is Samanta from Do Well Research.", voice='Polly.Raveena', language='en-IN')
 
     if message:
         response.say(message, voice='Polly.Raveena', language='en-IN')
 
+    response.pause(length=1)
     # Gather user speech response
     gather = Gather(input='speech', timeout=5, action=url_for('gather_response'), method='POST')
     gather.say("Please say Yes, No, or Call back later.", voice='Polly.Raveena', language='en-IN')
