@@ -135,6 +135,8 @@ def process_calls_in_batches(phone_data_list, batch_size=100):
 def index():
     return render_template('index.html')
 
+#Route configured for text to speech method
+
 @app.route('/handle-call', methods=['POST'])
 def handle_call():
     response = VoiceResponse()
@@ -142,18 +144,18 @@ def handle_call():
     message = request.args.get('message', '')
 
     greeting = "Hi" if not name else f"Hi, is this {name}?"
-    response.say(f"{greeting}, My name is Samanta from Do Well Research.", voice='alice')
+    response.say(f"{greeting}, My name is Samanta from Do Well Research.", voice='Polly.Raveena', language='en-IN')
 
     if message:
-        response.say(message, voice='alice')
+        response.say(message, voice='Polly.Raveena', language='en-IN')
 
     # Gather user speech response
     gather = Gather(input='speech', timeout=5, action=url_for('gather_response'), method='POST')
-    gather.say("Please say Yes, No, or Call back later.", voice='alice')
+    gather.say("Please say Yes, No, or Call back later.", voice='Polly.Raveena', language='en-IN')
     response.append(gather)
 
     # If no input, say goodbye
-    response.say("We did not receive a response. Thank you for your time.", voice='alice')
+    response.say("We did not receive a response. Thank you for your time.", voice='Polly.Raveena', language='en-IN')
     response.hangup()
 
     return Response(str(response), mimetype='text/xml')
@@ -171,16 +173,62 @@ def gather_response():
 
     # Match user response and reply accordingly
     if 'yes' in speech_result:
-        response.say("Thank you for the response. We will send you an invite shortly.", voice='alice')
+        response.say("Thank you for the response! We will send you an invite shortly.", voice='Polly.Raveena', language='en-IN')
     elif 'no' in speech_result:
-        response.say("Thank you for the response. We appreciate your time.", voice='alice')
+        response.say("Thank you for the response. We appreciate your time.", voice='Polly.Raveena', language='en-IN')
     elif 'call back later' in speech_result or 'i will call back' in speech_result:
-        response.say("Thank you for the response. We will call you back at another time", voice='alice')
+        response.say("Thank you for the response. We will call you back at another time", voice='Polly.Raveena', language='en-IN')
     else:
-        response.say("Sorry, I did not understand your response.", voice='alice')
+        response.say("Sorry, I did not understand your response.", voice='Polly.Raveena', language='en-IN')
 
     response.hangup()
     return Response(str(response), mimetype='text/xml')
+
+#Route configured for audio message
+
+# @app.route('/handle-call', methods=['POST'])
+# def handle_call():
+#     response = VoiceResponse()
+
+#     # Play the initial greeting (e.g., "Hi, is this ... my name is Samanta...")
+#     response.play(url_for('static', filename='greeting.mp3', _external=True))
+
+#     # Play the response prompt (e.g., "Please say Yes, No, or Call back later.")
+#     gather = Gather(input='speech', timeout=5, action=url_for('gather_response'), method='POST')
+#     gather.play(url_for('static', filename='prompt.mp3', _external=True))
+#     response.append(gather)
+
+#     # If no input, say goodbye (still TTS since it's not critical)
+#     response.say("We did not receive a response. Thank you for your time.", voice='alice')
+#     response.hangup()
+
+#     return Response(str(response), mimetype='text/xml')
+
+# @app.route('/gather-response', methods=['POST'])
+# def gather_response():
+#     response = VoiceResponse()
+
+#     speech_result = request.values.get('SpeechResult', '').lower()
+#     call_sid = request.values.get('CallSid')
+
+#     # Save the gathered speech response text
+#     if call_sid in calls_data:
+#         calls_data[call_sid]['gather_response'] = speech_result
+#         calls_data[call_sid]['responded'] = True
+
+#     # Match user response and play appropriate audio
+#     if 'yes' in speech_result:
+#         response.play(url_for('static', filename='yes_response.mp3', _external=True))
+#     elif 'no' in speech_result:
+#         response.play(url_for('static', filename='no_response.mp3', _external=True))
+#     elif 'call back later' in speech_result or 'i will call back' in speech_result:
+#         response.play(url_for('static', filename='callback_response.mp3', _external=True))
+#     else:
+#         response.play(url_for('static', filename='not_understood.mp3', _external=True))
+
+#     response.hangup()
+#     return Response(str(response), mimetype='text/xml')
+
 
 @app.route('/call-status', methods=['POST'])
 def call_status_callback():
@@ -203,6 +251,7 @@ def recording_callback():
 
     return '', 204
 
+# Deprecated
 # @app.route('/transcription-callback', methods=['POST'])
 # def transcription_callback():
 #     call_sid = request.form.get('CallSid')
