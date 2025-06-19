@@ -142,9 +142,13 @@ def handle_call():
     response = VoiceResponse()
     name = request.args.get('name', '')
     message = request.args.get('message', '')
-
-    greeting = "Hi" if not name else f"Hi, is this {name}?"
-    response.say(f"{greeting}, My name is Samanta from Do Well Research.", voice='Polly.Raveena', language='en-IN')
+    response.pause(length=2)
+    greeting = "Hi!" if not name else f"Hi! How are you today?"
+    response.say(f"{greeting}", voice='Polly.Raveena', language='en-IN')
+    response.pause(length=3)
+    response.say("Is this {name}?", voice='Polly.Raveena', language='en-IN')
+    response.pause(2)
+    response.say("My name is Samanta from Do Well Research.", voice='Polly.Raveena', language='en-IN')
 
     if message:
         response.say(message, voice='Polly.Raveena', language='en-IN')
@@ -199,7 +203,7 @@ def gather_response():
 #     response.append(gather)
 
 #     # If no input, say goodbye (still TTS since it's not critical)
-#     response.say("We did not receive a response. Thank you for your time.", voice='alice')
+#     response.say("We did not receive a response. Thank you for your time.", voice='Polly.Raveena', language='en-IN')
 #     response.hangup()
 
 #     return Response(str(response), mimetype='text/xml')
