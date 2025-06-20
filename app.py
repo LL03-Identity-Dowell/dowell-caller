@@ -12,6 +12,11 @@ from dotenv import load_dotenv
 from threading import Lock
 import json
 from io import StringIO
+import openai
+import traceback
+import logging
+import requests
+import assemblyai as aai
 
 # Load environment variables
 load_dotenv(dotenv_path='.env')
@@ -142,9 +147,11 @@ def handle_call():
     response = VoiceResponse()
     name = request.args.get('name', '')
     message = request.args.get('message', '')
-    response.pause(length=2)
-    greeting = "Hi!" if not name else f"Hi! Is this {name}?. How are you today?"
+    response.pause(length=1)
+    greeting = "Hi!" if not name else f"Hi! Is this {name}?"
     response.say(f"{greeting}", voice='Polly.Raveena', language='en-IN')
+    response.pause(length=2)
+    response.say("How are you today?")
     response.pause(length=3)
     response.say("My name is Samanta from Do Well Research.", voice='Polly.Raveena', language='en-IN')
 
@@ -154,7 +161,7 @@ def handle_call():
     response.pause(length=1)
     # Gather user speech response
     gather = Gather(input='speech', timeout=5, action=url_for('gather_response'), method='POST')
-    gather.say("Please say Yes, No, or Call back later.", voice='Polly.Raveena', language='en-IN')
+    gather.say("Please say Yes or No to proceed", voice='Polly.Raveena', language='en-IN')
     response.append(gather)
 
     # If no input, say goodbye
@@ -179,10 +186,10 @@ def gather_response():
         response.say("Thank you for the response! We will send you an invite shortly.", voice='Polly.Raveena', language='en-IN')
     elif 'no' in speech_result:
         response.say("Thank you for the response. We appreciate your time.", voice='Polly.Raveena', language='en-IN')
-    elif 'call back later' in speech_result or 'i will call back' in speech_result:
-        response.say("Thank you for the response. We will call you back at another time", voice='Polly.Raveena', language='en-IN')
+    # elif 'call back later' in speech_result or 'i will call back' in speech_result:
+    #     response.say("Thank you for the response. We will call you back at another time", voice='Polly.Raveena', language='en-IN')
     else:
-        response.say("Sorry, I did not understand your response.", voice='Polly.Raveena', language='en-IN')
+        response.say("Sorry, I did not get a response.", voice='Polly.Raveena', language='en-IN')
 
     response.hangup()
     return Response(str(response), mimetype='text/xml')
@@ -252,18 +259,49 @@ def recording_callback():
     if call_sid in calls_data:
         calls_data[call_sid]['recording_url'] = recording_url
 
+        try:
+            app.logger.info(f"[📞] Received recording callback for {call_sid}")
+            mp3_url = f"{recording_url}.mp3"
+
+            # Download the recording with Twilio auth
+            response = requests.get(mp3_url, auth=(TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN))
+            if response.status_code != 200:
+                raise Exception(f"Failed to download MP3. Status: {response.status_code}")
+
+            app.logger.info(f"[✅] MP3 file downloaded successfully.")
+
+            # Save to disk
+            temp_path = f"/tmp/{call_sid}.mp3"
+            with open(temp_path, "wb") as f:
+                f.write(response.content)
+            app.logger.info(f"[💾] Audio saved to {temp_path}")
+
+            # Transcribe with OpenAI v1 API
+            # from openai import OpenAI
+            # client = OpenAI()
+            # app.logger.info(f"[🤖] Sending audio file to OpenAI for transcription...")
+            aai.settings.api_key = os.environ.get("ASSEMBLYAI_API_KEY")
+
+            with open(temp_path, "rb") as audio_file:
+                # transcript_response = client.audio.transcriptions.create(
+                #     model="whisper-1",
+                #     file=audio_file,
+                #     response_format="text"
+                # )
+                # transcript_text = transcript_response
+                config = aai.TranscriptionConfig(speech_model=aai.SpeechModel.best)
+
+                transcript = aai.Transcriber(config=config).transcribe(audio_file)
+                if transcript.status == "error":
+                    raise RuntimeError(f"Transcription failed: {transcript.error}")
+                app.logger.info(f"[📝] Transcript received: {transcript.text[:60]}...")
+                calls_data[call_sid]["transcript"] = transcript.text
+
+        except Exception as e:
+            app.logger.error(f"[❌] Error during transcription for {call_sid}: {str(e)}")
+
     return '', 204
 
-# Deprecated
-# @app.route('/transcription-callback', methods=['POST'])
-# def transcription_callback():
-#     call_sid = request.form.get('CallSid')
-#     transcription_text = request.form.get('TranscriptionText')
-
-#     if call_sid in calls_data:
-#         calls_data[call_sid]['transcript'] = transcription_text
-
-#     return '', 204
 
 @app.route('/make-calls', methods=['POST'])
 def initiate_calls():
@@ -362,15 +400,17 @@ def cancel_calls():
 
 @app.route('/export-results', methods=['GET'])
 def export_results():
-    """Export call results as CSV"""
     format_type = request.args.get('format', 'csv')
 
     if format_type == 'csv':
-        # Convert calls_data to DataFrame
         df = pd.DataFrame.from_dict(calls_data, orient='index')
         df['call_sid'] = df.index
 
-        # Create CSV response
+        # Ensure all expected fields exist
+        for col in ['transcript', 'recording_url']:
+            if col not in df.columns:
+                df[col] = None
+
         csv_data = df.to_csv(index=False)
         return Response(
             csv_data,
@@ -379,6 +419,7 @@ def export_results():
         )
     else:
         return jsonify(calls_data)
+
 
 if __name__ == '__main__':
     os.makedirs('templates', exist_ok=True)

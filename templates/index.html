@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -21,13 +22,13 @@
             --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
             --transition: all 0.3s ease;
         }
-        
+
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
-        
+
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background-color: #f5f7fa;
@@ -36,13 +37,13 @@
             padding: 0;
             margin: 0;
         }
-        
+
         .container {
             max-width: 1000px;
             margin: 0 auto;
             padding: 20px;
         }
-        
+
         header {
             background: linear-gradient(135deg, var(--primary-dark), var(--primary));
             color: white;
@@ -51,7 +52,7 @@
             border-radius: 0 0 var(--border-radius) var(--border-radius);
             box-shadow: var(--shadow);
         }
-        
+
         header h1 {
             margin: 0;
             padding: 0 20px;
@@ -59,11 +60,11 @@
             display: flex;
             align-items: center;
         }
-        
+
         header h1 i {
             margin-right: 12px;
         }
-        
+
         .card {
             background: white;
             border-radius: var(--border-radius);
@@ -72,7 +73,7 @@
             margin-bottom: 25px;
             transition: var(--transition);
         }
-        
+
         .card-header {
             border-bottom: 1px solid #eee;
             padding-bottom: 15px;
@@ -84,19 +85,20 @@
             justify-content: space-between;
             align-items: center;
         }
-        
+
         .form-group {
             margin-bottom: 20px;
         }
-        
+
         label {
             display: block;
             margin-bottom: 8px;
             font-weight: 500;
             color: var(--dark);
         }
-        
-        input, select {
+
+        input,
+        select {
             width: 100%;
             padding: 10px 12px;
             border: 1px solid #ddd;
@@ -104,26 +106,27 @@
             font-size: 16px;
             transition: var(--transition);
         }
-        
-        input:focus, select:focus {
+
+        input:focus,
+        select:focus {
             outline: none;
             border-color: var(--primary-light);
             box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.15);
         }
-        
+
         small {
             display: block;
             color: var(--gray);
             margin-top: 5px;
             font-size: 13px;
         }
-        
+
         .btn-container {
             display: flex;
             gap: 10px;
             margin-top: 25px;
         }
-        
+
         .btn {
             padding: 10px 18px;
             border: none;
@@ -137,48 +140,48 @@
             transition: var(--transition);
             min-width: 120px;
         }
-        
+
         .btn i {
             margin-right: 8px;
         }
-        
+
         .btn-primary {
             background-color: var(--primary);
             color: white;
         }
-        
+
         .btn-primary:hover {
             background-color: var(--primary-dark);
         }
-        
+
         .btn-danger {
             background-color: var(--danger);
             color: white;
         }
-        
+
         .btn-danger:hover {
             background-color: #e01563;
         }
-        
+
         .btn-secondary {
             background-color: var(--gray);
             color: white;
         }
-        
+
         .btn-secondary:hover {
             background-color: #98a0a8;
         }
-        
+
         .btn:disabled {
             background-color: var(--gray);
             cursor: not-allowed;
             opacity: 0.7;
         }
-        
+
         .hidden {
             display: none !important;
         }
-        
+
         .status-bar {
             display: flex;
             padding: 15px;
@@ -189,29 +192,34 @@
             align-items: center;
             border-left: 4px solid var(--primary);
         }
-        
+
         .status-bar.success {
             border-left-color: var(--success);
         }
-        
+
         .status-bar.error {
             border-left-color: var(--danger);
         }
-        
+
         .status-bar.loading {
-            border-left-color: var(--warning); 
+            border-left-color: var(--warning);
         }
-        
+
         .spinner {
             animation: spin 1s linear infinite;
             margin-right: 10px;
         }
-        
+
         @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
         }
-        
+
         table {
             width: 100%;
             border-collapse: collapse;
@@ -221,23 +229,24 @@
             overflow: hidden;
             box-shadow: var(--shadow);
         }
-        
-        th, td {
+
+        th,
+        td {
             padding: 12px 15px;
             text-align: left;
             border-bottom: 1px solid #eee;
         }
-        
+
         th {
             background-color: #f8f9fa;
             font-weight: 500;
             color: var(--dark);
         }
-        
+
         tbody tr:hover {
             background-color: #f5f7fa;
         }
-        
+
         .status-badge {
             padding: 5px 10px;
             border-radius: 50px;
@@ -245,105 +254,106 @@
             font-weight: 500;
             display: inline-block;
         }
-        
+
         .status-badge.queued {
             background-color: #e9ecef;
             color: #495057;
         }
-        
+
         .status-badge.ringing {
             background-color: #caf0f8;
             color: #0077b6;
         }
-        
+
         .status-badge.in-progress {
             background-color: #ffe8d6;
             color: #fb8500;
         }
-        
+
         .status-badge.completed {
             background-color: #d8f3dc;
             color: #2d6a4f;
         }
-        
-        .status-badge.failed, 
-        .status-badge.busy, 
-        .status-badge.no-answer, 
+
+        .status-badge.failed,
+        .status-badge.busy,
+        .status-badge.no-answer,
         .status-badge.canceled {
             background-color: #ffccd5;
             color: #d90429;
         }
-        
+
         .link-button {
             color: var(--primary);
             text-decoration: none;
             font-weight: 500;
             transition: var(--transition);
         }
-        
+
         .link-button:hover {
             color: var(--primary-dark);
             text-decoration: underline;
         }
-        
+
         .empty-state {
             padding: 40px;
             text-align: center;
             color: var(--gray);
         }
-        
+
         .empty-state i {
             font-size: 48px;
             margin-bottom: 15px;
             opacity: 0.5;
         }
-        
+
         .section-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
             margin-bottom: 15px;
         }
-        
+
         .section-title {
             font-size: 20px;
             font-weight: 600;
             color: var(--dark);
         }
-        
+
         @media (max-width: 768px) {
             .btn-container {
                 flex-direction: column;
             }
-            
+
             .btn {
                 width: 100%;
             }
-            
+
             .status-bar {
                 flex-direction: column;
                 text-align: center;
             }
-            
+
             .status-bar div:first-child {
                 margin-bottom: 10px;
             }
         }
     </style>
 </head>
+
 <body>
     <header>
         <div class="container">
             <h1><i class="fas fa-phone-alt"></i> DoWell Samanta Caller</h1>
         </div>
     </header>
-    
+
     <div class="container">
         <div class="card">
             <div class="card-header">
                 Call Configuration
             </div>
-            
+
             <form id="callForm">
                 <div class="form-group">
                     <label for="dataSource">Data Source:</label>
@@ -352,13 +362,13 @@
                         <!-- <option value="google_sheet">Google Sheet</option> -->
                     </select>
                 </div>
-                
+
                 <div id="csvSection" class="form-group">
                     <label for="csvFile">CSV File:</label>
                     <input type="file" id="csvFile" name="file">
                     <small>CSV should have phone_number, name, and message</small>
                 </div>
-                
+
                 <!-- <div id="googleSheetSection" class="form-group hidden">
                     <div class="form-group">
                         <label for="sheetId">Google Sheet ID:</label>
@@ -371,13 +381,13 @@
                         <small>Default is "Sheet1"</small>
                     </div>
                 </div> -->
-                
+
                 <div class="form-group">
                     <label for="batchSize">Batch Size:</label>
                     <input type="number" id="batchSize" name="batch_size" value="100" min="1" max="500">
                     <small>Number of calls to make at a time</small>
                 </div>
-                
+
                 <div class="btn-container">
                     <button type="submit" class="btn btn-primary" id="startButton">
                         <i class="fas fa-phone"></i> Start Calling
@@ -391,14 +401,14 @@
                 </div>
             </form>
         </div>
-        
+
         <div id="statusMessage" class="status-bar hidden">
             <div>
                 <i class="fas fa-info-circle"></i> <span id="statusText"></span>
             </div>
             <div id="statusActions"></div>
         </div>
-        
+
         <div class="card" id="resultsCard">
             <div class="section-header">
                 <div class="section-title">Call Results</div>
@@ -406,7 +416,7 @@
                     <i class="fas fa-download"></i> Export CSV
                 </button>
             </div>
-            
+
             <div id="callResults">
                 <div class="empty-state">
                     <i class="fas fa-phone-slash"></i>
@@ -415,7 +425,7 @@
             </div>
         </div>
     </div>
-    
+
     <script>
         // DOM Elements
         const dataSourceSelect = document.getElementById('dataSource');
@@ -430,12 +440,12 @@
         const startButton = document.getElementById('startButton');
         const cancelButton = document.getElementById('cancelButton');
         const resetButton = document.getElementById('resetButton');
-        
+
         // State variables
         let callsInProgress = false;
         let callSids = [];
         let refreshInterval = null;
-        
+
         // Toggle data source sections when the selection changes
         dataSourceSelect.addEventListener('change', () => {
             if (dataSourceSelect.value === 'csv') {
@@ -446,28 +456,28 @@
                 googleSheetSection.classList.remove('hidden');
             }
         });
-        
+
         // Handle form submission (start calling)
         callForm.addEventListener('submit', (e) => {
             e.preventDefault();
             startCalling();
         });
-        
+
         // Reset button click handler
         resetButton.addEventListener('click', () => {
             resetApplication();
         });
-        
+
         // Cancel button click handler
         cancelButton.addEventListener('click', () => {
             cancelCalls();
         });
-        
+
         // Export button click handler
         exportBtn.addEventListener('click', () => {
             window.location.href = '/export-results?format=csv';
         });
-        
+
         // Get the status data and styling for call statuses
         function getStatusBadge(status) {
             const statusMap = {
@@ -480,7 +490,7 @@
                 "no-answer": "failed",
                 canceled: "canceled"
             };
-            
+
             const labelMap = {
                 queued: "Queued",
                 ringing: "Ringing",
@@ -491,115 +501,123 @@
                 "no-answer": "No Answer",
                 canceled: "Canceled"
             };
-            
+
             const badgeClass = statusMap[status] || "queued";
             const label = labelMap[status] || status;
-            
+
             return `<span class="status-badge ${badgeClass}">${label}</span>`;
         }
-        
+
         // Refresh the call status table
         function refreshCallStatus() {
             fetch('/calls-status')
-            .then(response => response.json())
-            .then(data => {
-                const callCount = Object.keys(data).length;
-                
-                if (callCount === 0) {
-                    // No calls yet, show empty state
-                    callResultsDiv.innerHTML = `
-                        <div class="empty-state">
-                            <i class="fas fa-phone-slash"></i>
-                            <p>No calls have been made yet</p>
-                        </div>
-                    `;
-                    callsInProgress = false;
-                    updateUIState();
-                    return;
-                }
-                
-                // Count calls by status
-                const statusCounts = {};
-                let completedCount = 0;
-                let totalCount = 0;
-                
-                for (const callData of Object.values(data)) {
-                    totalCount++;
-                    statusCounts[callData.status] = (statusCounts[callData.status] || 0) + 1;
-                    if (callData.status === 'completed' || callData.status === 'failed' || 
-                        callData.status === 'busy' || callData.status === 'no-answer' || 
-                        callData.status === 'canceled') {
-                        completedCount++;
+                .then(response => response.json())
+                .then(data => {
+                    const callCount = Object.keys(data).length;
+
+                    if (callCount === 0) {
+                        // No calls yet, show empty state
+                        callResultsDiv.innerHTML = `
+                <div class="empty-state">
+                    <i class="fas fa-phone-slash"></i>
+                    <p>No calls have been made yet</p>
+                </div>
+            `;
+                        callsInProgress = false;
+                        updateUIState();
+                        return;
                     }
-                }
-                
-                // Check if calls are still in progress
-                callsInProgress = completedCount < totalCount;
-                updateUIState();
-                
-                // If all calls are completed, stop the refresh interval
-                if (!callsInProgress && refreshInterval) {
-                    stopStatusRefresh();
-                }
-                
-                // Generate table HTML
-                let html = `
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Phone Number</th>
-                                <th>Name</th>
-                                <th>Status</th>
-                                <th>Recording</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                `;
-                
-                for (const [callSid, callData] of Object.entries(data)) {
-                    html += `
-                        <tr>
-                            <td>${callData.phone_number}</td>
-                            <td>${callData.name || '-'}</td>
-                            <td>${getStatusBadge(callData.status)}</td>
-                            <td>${callData.recording_url ? 
+
+                    const statusCounts = {};
+                    let completedCount = 0;
+                    let totalCount = 0;
+                    let allCompleteAndFilled = true;
+
+                    for (const callData of Object.values(data)) {
+                        totalCount++;
+                        const status = callData.status;
+
+                        statusCounts[status] = (statusCounts[status] || 0) + 1;
+
+                        const isTerminal =
+                            status === 'completed' || status === 'failed' ||
+                            status === 'busy' || status === 'no-answer' ||
+                            status === 'canceled';
+
+                        if (isTerminal) {
+                            completedCount++;
+
+                            if (!callData.recording_url || !callData.transcript) {
+                                allCompleteAndFilled = false;
+                            }
+                        } else {
+                            allCompleteAndFilled = false;
+                        }
+                    }
+
+                    callsInProgress = !allCompleteAndFilled;
+                    updateUIState();
+
+                    if (!callsInProgress && refreshInterval) {
+                        stopStatusRefresh();
+                    }
+
+                    // Generate table HTML
+                    let html = `
+            <table>
+                <thead>
+                    <tr>
+                        <th>Phone Number</th>
+                        <th>Name</th>
+                        <th>Status</th>
+                        <th>Recording</th>
+                        <th>Transcript</th>
+                    </tr>
+                </thead>
+                <tbody>
+        `;
+
+                    for (const [callSid, callData] of Object.entries(data)) {
+                        html += `
+                <tr>
+                    <td>${callData.phone_number}</td>
+                    <td>${callData.name || '-'}</td>
+                    <td>${getStatusBadge(callData.status)}</td>
+                    <td>${callData.recording_url ?
                                 `<a href="${callData.recording_url}" target="_blank" class="link-button">
-                                    <i class="fas fa-play-circle"></i> Listen
-                                </a>` : 
+                            <i class="fas fa-play-circle"></i> Listen
+                        </a>` :
                                 '-'}</td>
-                        </tr>
-                    `;
-                }
-                
-                html += '</tbody></table>';
-                callResultsDiv.innerHTML = html;
-                
-                // Update status message if calls are in progress
-                if (callsInProgress) {
-                    showStatusMessage(
-                        `Processing calls: ${completedCount} of ${totalCount} completed`, 
-                        'loading'
-                    );
-                } else if (totalCount > 0) {
-                    showStatusMessage(
-                        `All calls completed: ${completedCount} calls processed`, 
-                        'success',
-                        '<button class="btn btn-secondary" onclick="resetApplication()"><i class="fas fa-redo"></i> Start New Batch</button>'
-                    );
-                    
-                    // Stop the refresh interval since all calls are done
-                    stopStatusRefresh();
-                }
-            })
-            .catch(err => {
-                console.error('Error fetching call status:', err);
-            });
+                    <td>${callData.transcript ? callData.transcript : '-'}</td>
+                </tr>
+            `;
+                    }
+
+                    html += '</tbody></table>';
+                    callResultsDiv.innerHTML = html;
+
+                    if (callsInProgress) {
+                        showStatusMessage(
+                            `Processing calls: ${completedCount} of ${totalCount} completed (waiting on recordings/transcripts)...`,
+                            'loading'
+                        );
+                    } else {
+                        showStatusMessage(
+                            `All calls completed and data ready: ${completedCount} processed`,
+                            'success',
+                            '<button class="btn btn-secondary" onclick="resetApplication()"><i class="fas fa-redo"></i> Start New Batch</button>'
+                        );
+                    }
+                })
+                .catch(err => {
+                    console.error('Error fetching call status:', err);
+                });
         }
-        
+
         // Start the calling process
         function startCalling() {
             const formData = new FormData(callForm);
-            
+
             // Basic validation
             if (formData.get('data_source') === 'csv') {
                 if (!formData.get('file').name) {
@@ -612,59 +630,57 @@
                     return;
                 }
             }
-            
+
             // Disable form during call initiation
             startButton.disabled = true;
             callsInProgress = true;
             updateUIState();
-            
+
             showStatusMessage('<i class="fas fa-spinner spinner"></i> Starting calls...', 'loading');
-            
+
             fetch('/make-calls', {
                 method: 'POST',
                 body: formData
             })
-            .then(res => res.json())
-            .then(response => {
-                if (response.error) {
-                    showStatusMessage(`Error: ${response.error}`, 'error');
+                .then(res => res.json())
+                .then(response => {
+                    if (response.error) {
+                        showStatusMessage(`Error: ${response.error}`, 'error');
+                        callsInProgress = false;
+                    } else {
+                        callSids = response.call_sids || [];
+                        showStatusMessage(`${response.message}. Calls in progress...`, 'loading');
+
+                        // Start the status refresh interval only after calls have been initiated
+                        startStatusRefresh();
+
+                        // Initial call status refresh
+                        refreshCallStatus();
+                    }
+                })
+                .catch(err => {
+                    showStatusMessage(`Error: ${err.message}`, 'error');
                     callsInProgress = false;
-                } else {
-                    callSids = response.call_sids || [];
-                    showStatusMessage(`${response.message}. Calls in progress...`, 'loading');
-                    
-                    // Start the status refresh interval only after calls have been initiated
-                    startStatusRefresh();
-                    
-                    // Initial call status refresh
-                    refreshCallStatus();
-                }
-            })
-            .catch(err => {
-                showStatusMessage(`Error: ${err.message}`, 'error');
-                callsInProgress = false;
-            })
-            .finally(() => {
-                updateUIState();
-            });
+                })
+                .finally(() => {
+                    updateUIState();
+                });
         }
-        
+
         // Cancel ongoing calls
         function cancelCalls() {
             if (!callsInProgress || callSids.length === 0) {
                 return;
             }
-            
+
             showStatusMessage('<i class="fas fa-spinner spinner"></i> Cancelling calls...', 'loading');
-            
-            // This is a placeholder - you'll need to implement a proper API endpoint for cancellation
-            // For now, we'll just simulate it by showing a message
+
             setTimeout(() => {
                 showStatusMessage('Call cancellation requested. Some calls may still complete.', 'warning');
                 callsInProgress = false;
                 updateUIState();
                 refreshCallStatus();
-                
+
                 // Check again after a short delay to see if all calls are done
                 setTimeout(() => {
                     if (!callsInProgress) {
@@ -672,48 +688,24 @@
                     }
                 }, 5000);
             }, 1000);
-            
-            /*
-            fetch('/cancel-calls', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ call_sids: callSids })
-            })
-            .then(res => res.json())
-            .then(response => {
-                if (response.error) {
-                    showStatusMessage(`Error: ${response.error}`, 'error');
-                } else {
-                    showStatusMessage(response.message, 'success');
-                    callsInProgress = false;
-                    updateUIState();
-                }
-                refreshCallStatus();
-            })
-            .catch(err => {
-                showStatusMessage(`Error: ${err.message}`, 'error');
-            });
-            */
         }
-        
+
         // Reset the application
         function resetApplication() {
             // Reset form
             callForm.reset();
-            
+
             // Reset UI
             callsInProgress = false;
             callSids = [];
             updateUIState();
-            
+
             // Stop status refresh
             stopStatusRefresh();
-            
+
             // Hide status message
             statusMessage.classList.add('hidden');
-            
+
             // Reset results display
             callResultsDiv.innerHTML = `
                 <div class="empty-state">
@@ -721,26 +713,26 @@
                     <p>No calls have been made yet</p>
                 </div>
             `;
-            
+
             // Show CSV section by default
             csvSection.classList.remove('hidden');
             googleSheetSection.classList.add('hidden');
-            
+
             // Clear any file input
             const fileInput = document.getElementById('csvFile');
             fileInput.value = '';
         }
-        
+
         // Show status message with type (success, error, loading)
         function showStatusMessage(message, type = 'info', actions = '') {
             statusText.innerHTML = message;
             statusActions.innerHTML = actions;
-            
+
             statusMessage.className = 'status-bar';
             statusMessage.classList.add(type);
             statusMessage.classList.remove('hidden');
         }
-        
+
         // Update UI based on application state
         function updateUIState() {
             if (callsInProgress) {
@@ -753,16 +745,16 @@
                 resetButton.disabled = false;
             }
         }
-        
+
         // Start the status refresh interval
         function startStatusRefresh() {
             // Clear any existing interval first
             stopStatusRefresh();
-            
+
             // Set up a new interval
             refreshInterval = setInterval(refreshCallStatus, 5000);
         }
-        
+
         // Stop the status refresh interval
         function stopStatusRefresh() {
             if (refreshInterval) {
@@ -770,12 +762,12 @@
                 refreshInterval = null;
             }
         }
-        
+
         // Handle page refresh/reload
         window.addEventListener('beforeunload', () => {
             stopStatusRefresh();
         });
-        
+
         // Initial page load - just show empty state, don't start polling
         callResultsDiv.innerHTML = `
             <div class="empty-state">
@@ -785,4 +777,5 @@
         `;
     </script>
 </body>
+
 </html>
