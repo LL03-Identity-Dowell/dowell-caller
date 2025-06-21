@@ -280,7 +280,7 @@ def recording_callback():
             # from openai import OpenAI
             # client = OpenAI()
             # app.logger.info(f"[🤖] Sending audio file to OpenAI for transcription...")
-            aai.settings.api_key = os.environ.get("ASSEMBLYAI_API_KEY")
+            aai.settings.api_key = os.getenv("ASSEMBLYAI_API_KEY")
 
             with open(temp_path, "rb") as audio_file:
                 # transcript_response = client.audio.transcriptions.create(
